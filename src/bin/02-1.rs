@@ -1,4 +1,3 @@
-use ac::read_lines;
 use regex::Regex;
 
 struct Game {
@@ -23,29 +22,27 @@ impl Game {
 
 
 fn main() {
+    let input = include_str!("../../inputs/2.in");
+    let output = part1(input);
+    dbg!(output);
+}
+
+fn part1(input:&str) -> u32 {
+    let lines = input.lines();
     let mut sum = 0;
-    if let Ok(lines) = read_lines("inputs/2.in") {
-        for line in lines {
-            let current_line = &line.unwrap();
-            let (id, game_vec) = cleanup(&current_line);
-            let game:Game =  max_num(id, game_vec);
-            if game.is_possible(){
-                sum += game.id;
-            }
+    for line in lines {
+        let (id, game_vec) = cleanup(line);
+        let game:Game =  max_num(id, game_vec);
+        if game.is_possible(){
+            sum += game.id;
         }
-    }
-    println!("{sum}");
-    // let word = "Game 1: 7 blue, 5 red; 10 red, 7 blue; 5 blue, 4 green, 15 red; 4 green, 6 red, 7 blue; 5 green, 8 blue, 4 red; 5 red, 4 blue, 3 green".to_string();
-    // let (id, game_vec) = cleanup(&word);
-    // let game:Game =  max_num(id, game_vec);
-    // let r = game.is_possible();
-    // println!("{}",r);
+    };
+    sum
 }
 
 fn cleanup(game:&str) -> (u32, Vec<&str>){
     let re = Regex::new(r": ").unwrap();
     let re_comma = Regex::new(r"[;,] ").unwrap();
-
     let game_split:Vec<&str> = re.split(game).collect();
     let id:u32 = game_split[0].split_whitespace().nth(1).unwrap().parse().unwrap();
     let game_content = game_split[1];
@@ -68,4 +65,39 @@ fn max_num(id:u32, game_vec: Vec<&str>) -> Game {
         }
     }
     Game{id,r,g,b}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = part1(
+"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
+        );
+        assert_eq!(result,8);
+    }
+
+    #[test]
+    fn game1() {
+        let (id, game_vec) = cleanup(
+        "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
+        );
+        let game1 =  max_num(id, game_vec);
+        assert_eq!(game1.is_possible(),true);
+    }
+
+    #[test]
+    fn game3() {
+        let (id, game_vec) = cleanup(
+        "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red"
+        );
+        let game1 =  max_num(id, game_vec);
+        assert_eq!(game1.is_possible(),false);
+    }
 }
