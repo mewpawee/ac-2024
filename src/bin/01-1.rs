@@ -1,70 +1,58 @@
 const INPUT: &str = include_str!("../../inputs/1.in");
+
 fn main() {
+    // split line to vectors
     let lines: Vec<_> = INPUT
         .lines()
-        .enumerate()
-        .map(|(_x, line)| {
+        .map(|line| {
             line.split_whitespace()
                 .map(|y| y.parse::<i32>().unwrap())
                 .collect::<Vec<i32>>()
         })
         .collect();
 
-    let (mut first_elements, mut second_elements): (Vec<_>, Vec<_>) =
+    let (mut first_elements, mut second_elements): (Vec<i32>, Vec<i32>) =
         lines.into_iter().map(|pair| (pair[0], pair[1])).unzip();
 
     // sort vectors
     first_elements.sort();
     second_elements.sort();
 
-    // let a = map.iter();
+    // part 1
+    // sum diff
     let mut diffs: Vec<i32> = Vec::new();
     for i in 0..first_elements.len() {
         let diff = first_elements[i] - second_elements[i];
         let diff_abs = diff.abs();
         diffs.push(diff_abs)
     }
-    let sum = diffs.iter().sum::<i32>();
-    println!("{:?}", sum);
+    let diffs_sum = diffs.iter().sum::<i32>();
+    println!("diffs: {:?}", diffs_sum);
 
-    // let (first_elements, second_elements): (Vec<_>, Vec<_>) =
-    //     map.into_iter().map(|pair| (pair[0], pair[1])).unzip();
+    // part2
+    let mut similars: Vec<i32> = Vec::new();
 
-    // let output = part1(input);
-    // println!("{output}");
+    for first_element in first_elements.clone() {
+        let mut count = 0;
+        for second_element in second_elements.clone() {
+            if first_element == second_element {
+                count += 1;
+            }
+        }
+        similars.push(first_element * count)
+    }
+    let similars_sum = similars.iter().sum::<i32>();
+    println!("similars: {:?}", similars_sum);
 }
 
 fn part1(input: &str) -> u32 {
     let lines = input.lines();
     let mut sum = 0;
     for line in lines {
-        let result: u32 = calibrate(line);
+        let result: u32 = 0;
         sum += result;
     }
     sum
-}
-
-fn calibrate(word: &str) -> u32 {
-    let mut first: Option<char> = None;
-    let mut last: Option<char> = None;
-
-    for char in word.chars() {
-        if char.is_numeric() {
-            first = Some(char);
-            break;
-        }
-    }
-
-    for char in word.chars().rev() {
-        if char.is_numeric() {
-            last = Some(char);
-            break;
-        }
-    }
-
-    let mut number = first.unwrap().to_string();
-    number.push(last.unwrap());
-    number.parse().unwrap()
 }
 
 #[cfg(test)]
@@ -82,3 +70,4 @@ mod tests {
         assert_eq!(result, 142);
     }
 }
+
